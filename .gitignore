@@ -6,3 +6,6 @@ gputesting.py
 .DS_Store
 alexnet.py
 datagenerator.py
+CORRECTCLASSIFIED
+MISCLASSIFIED
+TestingResults
