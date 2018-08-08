@@ -49,7 +49,7 @@ else:
     os.makedirs('CORRECTCLASSIFIED')
 
 
-
+#! IMPLEMENT THE ALEXNET for classification, softmax
 
 
 
