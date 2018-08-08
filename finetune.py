@@ -8,6 +8,8 @@ from datetime import datetime
 train_file = '/home/stroke95/Desktop/PS_Classifier/Train_Bank1.txt'
 val_file = '/home/stroke95/Desktop/PS_Classifier/Val_Bank1.txt'
 
+print("Testing")
+
 # HyperParams
 learning_rate = 0.001  
 num_epochs = 500
