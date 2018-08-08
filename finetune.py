@@ -5,10 +5,9 @@ from alexnet import AlexNet
 from datagenerator import ImageDataGenerator
 from datetime import datetime
 
+# Path for the files
 train_file = '/home/stroke95/Desktop/PS_Classifier/Train_Bank1.txt'
 val_file = '/home/stroke95/Desktop/PS_Classifier/Val_Bank1.txt'
-
-print("Testing")
 
 # HyperParams
 learning_rate = 0.001  
@@ -16,7 +15,7 @@ num_epochs = 500
 batch_size = 32  # batch_size * 227 * 227
 dropout_rate = 0.5
 num_classes = 2  # Final class output for Diff and Undiff
-train_layers = ['fc8', 'fc7']  # Trainable layers, f8 dropout + f7 softmax
+train_layers = ['fc8', 'fc7']  # Trainable layers, f8 dropout + f7 softmax. f6 is flatten layer
 
 # How often we want to write the tf.summary data to disk
 display_step = 1
@@ -24,17 +23,15 @@ display_step = 1
 # Path for model checkpoint and tensorboard
 tensorboard_path = "/home/stroke95/Desktop/PS_Classifier/tensorboard"
 checkpoint_path = "/home/stroke95/Desktop/PS_Classifier/checkpoint"
-print("testing")
+
 with tf.device('/cpu:0'):
 
-    #! Returns the images in BGR format, use eager_execution to see the images
     tr_data = ImageDataGenerator(train_file,
                                  mode='training',
                                  batch_size=batch_size,
                                  num_classes=num_classes,
                                  shuffle=True)
 
-    #! Same data but only path is different
     val_data = ImageDataGenerator(val_file,
                                   mode='inference',
                                   batch_size=batch_size,
