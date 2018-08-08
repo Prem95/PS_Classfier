@@ -6,3 +6,8 @@ gputesting.py
 .DS_Store
 alexnet.py
 datagenerator.py
+tensorboard
+checkpoint
+Test_Bank1.txt
+Train_Bank1.txt
+Val_Bank1.txt
