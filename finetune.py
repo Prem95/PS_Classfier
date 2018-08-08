@@ -22,7 +22,7 @@ display_step = 1
 # Path for model checkpoint and tensorboard
 tensorboard_path = "/home/stroke95/Desktop/PS_Classifier/tensorboard"
 checkpoint_path = "/home/stroke95/Desktop/PS_Classifier/checkpoint"
-
+print("testing")
 with tf.device('/cpu:0'):
 
     #! Returns the images in BGR format, use eager_execution to see the images
