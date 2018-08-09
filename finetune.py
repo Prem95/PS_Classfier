@@ -73,7 +73,7 @@ with tf.name_scope("train"):
     gradients = tf.gradients(loss, var_list)
     gradients = list(zip(gradients, var_list))
 
-    # Create optimizer and apply gradient descent to the trainable variables
+    # Create optimizer and apply adam to the trainable variables
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     train_op = optimizer.apply_gradients(grads_and_vars=gradients)
 
@@ -121,7 +121,7 @@ with tf.Session() as sess:
     # Load the pretrained weights into the non-trainable layer
     model.load_initial_weights(sess)
 
-    print("{} Training".format(datetime.now()))
+    print("{} Training now...".format(datetime.now()))
     print("{} --logdir {}".format(datetime.now(), tensorboard_path))
 
     # Loop over number of epochs

@@ -5,7 +5,7 @@ import numpy as np
 class AlexNet(object):
 
     def __init__(self, x, keep_prob, num_classes, skip_layer,
-                 weights_path='DEFAULT'):
+                 weights_path='DEFAULT', load_pretrained_weights=False):
         """Create the graph of the AlexNet model.
 
         Args:
@@ -22,6 +22,8 @@ class AlexNet(object):
         self.NUM_CLASSES = num_classes
         self.KEEP_PROB = keep_prob
         self.SKIP_LAYER = skip_layer
+        self.load_pretrained_weights = load_pretrained_weights
+
 
         if weights_path == 'DEFAULT':
             self.WEIGHTS_PATH = 'bvlc_alexnet.npy'
@@ -63,35 +65,51 @@ class AlexNet(object):
         fc7 = fc(dropout6, 4096, 4096, name='fc7')
         dropout7 = dropout(fc7, self.KEEP_PROB)
 
-        # 8th Layer: FC and return unscaled activations
+        # 8th Layer: FC and return unscaled activations #! SVM in later part of project
         self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
     def load_initial_weights(self, session):
-       
-        # Load the weights into memory
-        weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
 
-        # Loop over all layer names stored in the weights dict
-        for op_name in weights_dict:
+        if self.load_pretrained_weights == False:
+            # Load the weights into memory
+            weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
+            # Loop over all layer names stored in the weights dict
+            for op_name in weights_dict:
+                # Check if layer should be trained from scratch
+                if op_name not in self.SKIP_LAYER:
+                    with tf.variable_scope(op_name, reuse=True):
+                        # Assign weights/biases to their corresponding tf variable
+                        for data in weights_dict[op_name]:
+                            # Biases
+                            if len(data.shape) == 1:
+                                var = tf.get_variable('biases', trainable=False)
+                                session.run(var.assign(data))
+                            # Weights
+                            else:
+                                var = tf.get_variable('weights', trainable=False)
+                                session.run(var.assign(data))
+        
+        if self.load_pretrained_weights == True:
 
-            # Check if layer should be trained from scratch
-            if op_name not in self.SKIP_LAYER:
+            print("Loading the pretrained weights")
+            weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
 
-                with tf.variable_scope(op_name, reuse=True):
+            for op in weights_dict:
+                if op not in self.SKIP_LAYER:
+                    op_name = op.name
+                    string_end = op_name.find('/')
+                    layername = op_name[:string_end]
+                    print(layername)
 
-                    # Assign weights/biases to their corresponding tf variable
-                    for data in weights_dict[op_name]:
-
-                        # Biases
-                        if len(data.shape) == 1:
+                    with tf.variable_scope(layername, reuse=True):
+                        if len(op.shape) == 1:
                             var = tf.get_variable('biases', trainable=False)
-                            session.run(var.assign(data))
-
-                        # Weights
+                            v = session.run(op)
+                            session.run(var.assign(v))
                         else:
-                            var = tf.get_variable('weights', trainable=False)
-                            session.run(var.assign(data))
-
+                            var = tf.get_variable('biases', trainable=False)
+                            v = session.run(op)
+                            session.run(var.assign(v))
 
 def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
          padding='SAME', groups=1):

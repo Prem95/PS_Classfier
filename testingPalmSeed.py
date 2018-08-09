@@ -10,7 +10,7 @@ from caffe_classes import class_names
 
 # Initializer
 num_classes = 2
-original_class_label = ''
+original_class_label = '' # Diff for undiff
 
 imagenet_mean = np.array([104., 117., 124.], dtype=np.float32)
 
@@ -34,14 +34,14 @@ with open(test_path, 'r') as tp:
         testLabelsPathList.append(label)
         testImages.append(cv2.imread(img))
         labels.append(label)
-print(testImagePathList)
+
 print("Total number of files = " + str(len(testImagePathList)))
 
-resultsFilename = './TestingResults/Result_Classifier_1.txt'
+resultsFilename = '/home/stroke95/Desktop/PS_Classfier/TestingResults/Result_Classifier_1.txt'
 
 # Check file path
 if (os.path.isdir('MISCLASSIFIED')) == True:
-    print('MISSCLASSIFIED -  Exists')
+    print('MISSCLASSIFIED - Exists')
 else:
     os.makedirs('MISCLASSIFIED')
 
@@ -52,5 +52,25 @@ else:
 
 
 #! IMPLEMENT THE ALEXNET for classification
+
+x = tf.placeholder(tf.float32, [1, 227, 227, 3])
+keep_prob = tf.placeholder(tf.float32)
+
+with tf.Session() as sess: # InteractiveSession() for ipython 
+    saver = tf.train.import_meta_graph('/home/stroke95/Desktop/PS_Classfier/Checkpoint/model_epoch500.ckpt.meta')
+    saver.restore(sess, tf.train.latest_checkpoint('/home/stroke95/Desktop/PS_Classfier/Checkpoint/'))
+    saved_dict = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+
+model = AlexNet(x, keep_prob, num_classes, [], saved_dict, load_pretrained_weights=True)
+model.load_initial_weights(sess) # ! Loads the weights from the saver.restore(meta)
+
+# //* Final layer for the score calculation
+score = model.fc8 
+softmax = tf.nn.softmax(score)
+print(softmax)
+
+
+
+
 
 
