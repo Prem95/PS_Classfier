@@ -1,9 +1,10 @@
-import numpy as np 
-import tensorflow as tf 
 import os
-import cv2
-from matplotlib import pyplot as plt
 import shutil
+import tkinter
+import cv2
+import numpy as np
+import tensorflow as tf
+from matplotlib import pyplot as plt
 from alexnetType1 import AlexNet
 from caffe_classes import class_names
 
@@ -33,6 +34,7 @@ with open(test_path, 'r') as tp:
         testLabelsPathList.append(label)
         testImages.append(cv2.imread(img))
         labels.append(label)
+print(testImagePathList)
 print("Total number of files = " + str(len(testImagePathList)))
 
 resultsFilename = './TestingResults/Result_Classifier_1.txt'
@@ -49,12 +51,6 @@ else:
     os.makedirs('CORRECTCLASSIFIED')
 
 
-#! IMPLEMENT THE ALEXNET for classification, softmax
+#! IMPLEMENT THE ALEXNET for classification
 
 
-
-
-
-
-    
-    

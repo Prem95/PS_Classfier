@@ -1,11 +1,13 @@
 .vscode
 __pycache__
 bvlc_alexnet.npy
-caffe_classes.py 
 gputesting.py
 .DS_Store
 alexnet.py
 datagenerator.py
-CORRECTCLASSIFIED
-MISCLASSIFIED
-TestingResults
+CORRECTCLASSIFIED/
+MISCLASSIFIED/
+TestingResults/
+checkpoint/
+tensorboard
+.txt
