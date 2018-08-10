@@ -66,24 +66,27 @@ class AlexNet(object):
         dropout7 = dropout(fc7, self.KEEP_PROB)
 
         # 8th Layer: FC and return unscaled activations #! SVM in later part of project
-        self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
+        self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu = False, name = 'fc8')
 
     def load_initial_weights(self, session):
 
         if self.load_pretrained_weights == False:
             # Load the weights into memory
-            weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
+            weights_dict = np.load(self.WEIGHTS_PATH, encoding ='bytes').item()
             # Loop over all layer names stored in the weights dict
             for op_name in weights_dict:
                 # Check if layer should be trained from scratch
                 if op_name not in self.SKIP_LAYER:
+
                     with tf.variable_scope(op_name, reuse=True):
                         # Assign weights/biases to their corresponding tf variable
                         for data in weights_dict[op_name]:
+
                             # Biases
                             if len(data.shape) == 1:
                                 var = tf.get_variable('biases', trainable=False)
                                 session.run(var.assign(data))
+
                             # Weights
                             else:
                                 var = tf.get_variable('weights', trainable=False)
@@ -91,25 +94,28 @@ class AlexNet(object):
         
         if self.load_pretrained_weights == True:
 
-            print("Loading the pretrained weights")
-            weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
+            print("Loading the pretrained weights...")
+            weights_dict = self.WEIGHTS_PATH
 
             for op in weights_dict:
                 if op not in self.SKIP_LAYER:
                     op_name = op.name
-                    string_end = op_name.find('/')
+                    string_end = op_name.find('/', 1)
                     layername = op_name[:string_end]
                     print(layername)
 
-                    with tf.variable_scope(layername, reuse=True):
+                    with tf.variable_scope(layername, reuse = tf.AUTO_REUSE):
+
                         if len(op.shape) == 1:
-                            var = tf.get_variable('biases', trainable=False)
+                            var = tf.get_variable('biases', trainable = False)
                             v = session.run(op)
                             session.run(var.assign(v))
                         else:
-                            var = tf.get_variable('biases', trainable=False)
+                            var = tf.get_variable('weights', trainable = False)
                             v = session.run(op)
                             session.run(var.assign(v))
+
+##############################################################################################*
 
 def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
          padding='SAME', groups=1):
@@ -118,7 +124,7 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
     input_channels = int(x.get_shape()[-1])
 
     # Create lambda function for the convolution
-    def convolve(i, k): return tf.nn.conv2d(i, k,
+    convolve = lambda i, k: tf.nn.conv2d(i, k,
                                             strides=[1, stride_y, stride_x, 1],
                                             padding=padding)
 

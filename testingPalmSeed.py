@@ -37,7 +37,7 @@ with open(test_path, 'r') as tp:
 
 print("Total number of files = " + str(len(testImagePathList)))
 
-resultsFilename = '/home/stroke95/Desktop/PS_Classfier/TestingResults/Result_Classifier_1.txt'
+resultsFilename = './Result_Classifier_1.txt'
 
 # Check file path
 if (os.path.isdir('MISCLASSIFIED')) == True:
@@ -56,18 +56,19 @@ else:
 x = tf.placeholder(tf.float32, [1, 227, 227, 3])
 keep_prob = tf.placeholder(tf.float32)
 
-with tf.Session() as sess: # InteractiveSession() for ipython 
-    saver = tf.train.import_meta_graph('/home/stroke95/Desktop/PS_Classfier/Checkpoint/model_epoch500.ckpt.meta')
-    saver.restore(sess, tf.train.latest_checkpoint('/home/stroke95/Desktop/PS_Classfier/Checkpoint/'))
+with tf.Session() as sess:
+
+    saver = tf.train.import_meta_graph('./Checkpoint/model_epoch500.ckpt.meta')
+    saver.restore(sess, tf.train.latest_checkpoint('./Checkpoint/'))
     saved_dict = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
 
-model = AlexNet(x, keep_prob, num_classes, [], saved_dict, load_pretrained_weights=True)
-model.load_initial_weights(sess) # ! Loads the weights from the saver.restore(meta)
+    model = AlexNet(x, keep_prob, num_classes, [], saved_dict, load_pretrained_weights=True)
+    model.load_initial_weights(sess) # ! Loads the weights from the saver.restore(meta)
 
 # //* Final layer for the score calculation
-score = model.fc8 
-softmax = tf.nn.softmax(score)
-print(softmax)
+    score = model.fc8 
+    softmax = tf.nn.softmax(score)
+    print(softmax)
 
 
 
