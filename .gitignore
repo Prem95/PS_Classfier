@@ -9,5 +9,6 @@ CORRECTCLASSIFIED/
 MISCLASSIFIED/
 TestingResults/
 Checkpoint/
+checkpoint/
 tensorboard
 *.txt

@@ -7,12 +7,11 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 
-# Load the classes
+# Load the classes. See phone image for the other classes
 Class_List = [0, 3]
 Train_List = [40, 164]
 Val_List = [16, 16]
 Test_List = [16, 16]
-
 Train_No = 0
 Valid_No = 0
 Test_No = 0
@@ -31,8 +30,8 @@ for index, classindex in enumerate(Class_List):
     Col2 = []  # Path
 
     rootClass = '/home/stroke95/Desktop/PS_img_classifier_1'
-    for root, dirs, files in os.walk(rootClass, topdown = False):
-        if className in root:  # if Class exists
+    for root, dirs, files in os.walk(rootClass, topdown=False):
+        if className in root:  
             for name in files:
                 path = os.path.join(root, name)
                 path = path[1:]
@@ -66,5 +65,4 @@ for index, classindex in enumerate(Class_List):
 
             for counter in range(0, len(trainData)):
                 train.write("{} 0\n".format(
-                     trainData.Path.values[counter], trainData.Class.values[counter]))
-                     
+                     trainData.Path.values[counter], trainData.Class.values[counter]))                   

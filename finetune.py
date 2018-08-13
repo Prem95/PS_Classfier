@@ -6,8 +6,8 @@ from datagenerator import ImageDataGenerator
 from datetime import datetime
 
 # Path for the files
-train_file = '/home/stroke95/Desktop/PS_Classifier/Train_Bank1.txt'
-val_file = '/home/stroke95/Desktop/PS_Classifier/Val_Bank1.txt'
+train_file = '/home/stroke95/Desktop/PS_Classfier/Train_Bank1.txt'
+val_file = '/home/stroke95/Desktop/PS_Classfier/Val_Bank1.txt'
 
 # HyperParams
 learning_rate = 0.001  
@@ -15,14 +15,14 @@ num_epochs = 500
 batch_size = 32  # batch_size * 227 * 227
 dropout_rate = 0.5
 num_classes = 2  # Final class output for Diff and Undiff
-train_layers = ['fc8', 'fc7']  # Trainable layers, f8 dropout + f7 softmax. f6 is flatten layer
+train_layers = ['fc8', 'fc7']  # Trainable layers, f8 dropout + f7 softmax
 
 # How often we want to write the tf.summary data to disk
-display_step = 1
+display_step = 10
 
 # Path for model checkpoint and tensorboard
-tensorboard_path = "/home/stroke95/Desktop/PS_Classifier/tensorboard"
-checkpoint_path = "/home/stroke95/Desktop/PS_Classifier/checkpoint"
+tensorboard_path = "/home/stroke95/Desktop/PS_Classfier/tensorboard"
+checkpoint_path = "/home/stroke95/Desktop/PS_Classfier/checkpoint"
 
 with tf.device('/cpu:0'):
 
@@ -74,7 +74,7 @@ with tf.name_scope("train"):
     gradients = list(zip(gradients, var_list))
 
     # Create optimizer and apply adam to the trainable variables
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
     train_op = optimizer.apply_gradients(grads_and_vars=gradients)
 
 # Add gradients to summary
@@ -166,8 +166,7 @@ with tf.Session() as sess:
             test_count = test_count + 1
         test_acc /= test_count
 
-        print("{} Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
-
+        print("{} Validation Accuracy = {:.3f}".format(datetime.now(), test_acc))
         # save checkpoint of the model
         checkpoint_name = os.path.join(checkpoint_path,
                                        'model_epoch' + str(epoch + 1) + '.ckpt')

@@ -1,30 +1,16 @@
 import tensorflow as tf
 import numpy as np
 
-# AlexNet implementation on TensorFlow
 class AlexNet(object):
-
     def __init__(self, x, keep_prob, num_classes, skip_layer,
-                 weights_path='DEFAULT', load_pretrained_weights=False):
-        """Create the graph of the AlexNet model.
+                 weights_path='DEFAULT',load_pretrained_weight=False):
 
-        Args:
-            x: Placeholder for the input tensor.
-            keep_prob: Dropout probability.
-            num_classes: Number of classes in the dataset.
-            skip_layer: List of names of the layer, that get trained from
-                scratch
-            weights_path: Complete path to the pretrained weight file, if it
-                isn't in the same folder as this code
-        """
         # Parse input arguments into class variables
         self.X = x
         self.NUM_CLASSES = num_classes
         self.KEEP_PROB = keep_prob
         self.SKIP_LAYER = skip_layer
-        self.load_pretrained_weights = load_pretrained_weights
-
-
+        self.load_pretrained_weight=load_pretrained_weight
         if weights_path == 'DEFAULT':
             self.WEIGHTS_PATH = 'bvlc_alexnet.npy'
         else:
@@ -35,18 +21,18 @@ class AlexNet(object):
 
     def create(self):
 
-        # 1st Layer: Conv (w ReLu) -> Lrn -> Pool
+        # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
         conv1 = conv(self.X, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
         norm1 = lrn(conv1, 2, 1e-04, 0.75, name='norm1')
         pool1 = max_pool(norm1, 3, 3, 2, 2, padding='VALID', name='pool1')
 
-        # 2nd Layer: Conv (w ReLu)  -> Lrn -> Pool with 2 groups
+        # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
         conv2 = conv(pool1, 5, 5, 256, 1, 1, groups=2, name='conv2')
-        norm2 = lrn(conv2, 2, 1e-04, 0.75, name='norm2')
-        pool2 = max_pool(norm2, 3, 3, 2, 2, padding='VALID', name='pool2')
+        pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
+        norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
 
         # 3rd Layer: Conv (w ReLu)
-        conv3 = conv(pool2, 3, 3, 384, 1, 1, name='conv3')
+        conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
 
         # 4th Layer: Conv (w ReLu) splitted into two groups
         conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
@@ -61,62 +47,38 @@ class AlexNet(object):
         dropout6 = dropout(fc6, self.KEEP_PROB)
 
         # 7th Layer: FC (w ReLu) -> Dropout
-        #! Dropout maintain the spatial dimention of the tensors (4096 to 4096)
         fc7 = fc(dropout6, 4096, 4096, name='fc7')
         dropout7 = dropout(fc7, self.KEEP_PROB)
 
-        # 8th Layer: FC and return unscaled activations #! SVM in later part of project
-        self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu = False, name = 'fc8')
+        # 8th Layer: FC and return unscaled activations
+        self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
     def load_initial_weights(self, session):
-
-        if self.load_pretrained_weights == False:
-            # Load the weights into memory
-            weights_dict = np.load(self.WEIGHTS_PATH, encoding ='bytes').item()
-            # Loop over all layer names stored in the weights dict
-            for op_name in weights_dict:
-                # Check if layer should be trained from scratch
-                if op_name not in self.SKIP_LAYER:
-
-                    with tf.variable_scope(op_name, reuse=True):
-                        # Assign weights/biases to their corresponding tf variable
-                        for data in weights_dict[op_name]:
-
-                            # Biases
-                            if len(data.shape) == 1:
-                                var = tf.get_variable('biases', trainable=False)
-                                session.run(var.assign(data))
-
-                            # Weights
-                            else:
-                                var = tf.get_variable('weights', trainable=False)
-                                session.run(var.assign(data))
-        
-        if self.load_pretrained_weights == True:
-
-            print("Loading the pretrained weights...")
+                          
+        if self.load_pretrained_weight == True:
+            print("Loading the pretrained weights.....")
             weights_dict = self.WEIGHTS_PATH
-
+            
+            # Loop over all layer names stored in the weights dict
             for op in weights_dict:
+                # Check if the layer is one of the layers that should be reinitialized
                 if op not in self.SKIP_LAYER:
-                    op_name = op.name
-                    string_end = op_name.find('/', 1)
-                    layername = op_name[:string_end]
-                    print(layername)
-
-                    with tf.variable_scope(layername, reuse = tf.AUTO_REUSE):
-
-                        if len(op.shape) == 1:
-                            var = tf.get_variable('biases', trainable = False)
-                            v = session.run(op)
-                            session.run(var.assign(v))
+                    OP_Name = op.name
+                    print(op)
+                    string_end = OP_Name.find('/', 1)
+                    LayerName = OP_Name[:string_end]
+               # Copy data to variable and assign it in a session
+                    with tf.variable_scope(LayerName, reuse = tf.AUTO_REUSE):
+                        if len(op.shape)==1:
+                            var = tf.get_variable("biases", trainable = False)
+                            v_=session.run(op)
+                            session.run(var.assign(v_))
                         else:
-                            var = tf.get_variable('weights', trainable = False)
-                            v = session.run(op)
-                            session.run(var.assign(v))
-
-##############################################################################################*
-
+                            var = tf.get_variable("weights", trainable = False)
+                            v_=session.run(op)
+                            session.run(var.assign(v_))   
+             
+                
 def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
          padding='SAME', groups=1):
 
@@ -125,8 +87,8 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
 
     # Create lambda function for the convolution
     convolve = lambda i, k: tf.nn.conv2d(i, k,
-                                            strides=[1, stride_y, stride_x, 1],
-                                            padding=padding)
+                                         strides=[1, stride_y, stride_x, 1],
+                                         padding=padding)
 
     with tf.variable_scope(name) as scope:
         # Create tf variables for the weights and biases of the conv layer
@@ -145,14 +107,13 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
         input_groups = tf.split(axis=3, num_or_size_splits=groups, value=x)
         weight_groups = tf.split(axis=3, num_or_size_splits=groups,
                                  value=weights)
-        output_groups = [convolve(i, k)
-                         for i, k in zip(input_groups, weight_groups)]
+        output_groups = [convolve(i, k) for i, k in zip(input_groups, weight_groups)]
 
         # Concat the convolved output together again
         conv = tf.concat(axis=3, values=output_groups)
 
     # Add biases
-    bias = tf.reshape(tf.nn.bias_add(conv, biases), tf.shape(conv))
+    bias = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape().as_list())
 
     # Apply relu function
     relu = tf.nn.relu(bias, name=scope.name)
@@ -193,6 +154,7 @@ def lrn(x, radius, alpha, beta, name, bias=1.0):
     return tf.nn.local_response_normalization(x, depth_radius=radius,
                                               alpha=alpha, beta=beta,
                                               bias=bias, name=name)
+
 
 def dropout(x, keep_prob):
     """Create a dropout layer."""
