@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 class AlexNet(object):
+    
     def __init__(self, x, keep_prob, num_classes, skip_layer,
                  weights_path='DEFAULT',load_pretrained_weight=False):
 
@@ -56,7 +57,7 @@ class AlexNet(object):
     def load_initial_weights(self, session):
                           
         if self.load_pretrained_weight == True:
-            print("Loading the pretrained weights.....")
+            print("Loading the self trained weights...")
             weights_dict = self.WEIGHTS_PATH
             
             # Loop over all layer names stored in the weights dict
@@ -64,21 +65,24 @@ class AlexNet(object):
                 # Check if the layer is one of the layers that should be reinitialized
                 if op not in self.SKIP_LAYER:
                     OP_Name = op.name
-                    print(op)
+                    
                     string_end = OP_Name.find('/', 1)
                     LayerName = OP_Name[:string_end]
+                
                # Copy data to variable and assign it in a session
                     with tf.variable_scope(LayerName, reuse = tf.AUTO_REUSE):
                         if len(op.shape)==1:
                             var = tf.get_variable("biases", trainable = False)
-                            v_=session.run(op)
+                            v_ = session.run(op)
+                            print('Loading layers into memory...')
                             session.run(var.assign(v_))
                         else:
                             var = tf.get_variable("weights", trainable = False)
-                            v_=session.run(op)
+                            v_ = session.run(op)
+                            print('Loading layers into memory...')
                             session.run(var.assign(v_))   
-             
-                
+
+
 def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
          padding='SAME', groups=1):
 
@@ -120,7 +124,6 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
 
     return relu
 
-
 def fc(x, num_in, num_out, name, relu=True):
     """Create a fully connected layer."""
     with tf.variable_scope(name) as scope:
@@ -140,7 +143,6 @@ def fc(x, num_in, num_out, name, relu=True):
     else:
         return act
 
-
 def max_pool(x, filter_height, filter_width, stride_y, stride_x, name,
              padding='SAME'):
     """Create a max pooling layer."""
@@ -148,13 +150,11 @@ def max_pool(x, filter_height, filter_width, stride_y, stride_x, name,
                           strides=[1, stride_y, stride_x, 1],
                           padding=padding, name=name)
 
-
 def lrn(x, radius, alpha, beta, name, bias=1.0):
     """Create a local response normalization layer."""
     return tf.nn.local_response_normalization(x, depth_radius=radius,
                                               alpha=alpha, beta=beta,
                                               bias=bias, name=name)
-
 
 def dropout(x, keep_prob):
     """Create a dropout layer."""

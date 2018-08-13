@@ -1,3 +1,2 @@
-class_names = '''
-Class_0_Differentiated
-Class_1_Undifferentiated'''.split("\n")
+class_names = '''Class_0
+Class_1'''.split("\n")
