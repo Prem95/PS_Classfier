@@ -1,8 +1,7 @@
 # PS_Classfier
 
-In this personal project, an approach is taken to perform image classfication using transfer learning. Using the pretrained model of Alexnet, the weights are update to include the personal image dataset. 
+In this project, an approach is taken to perform image classfication using transfer learning. 
 
-# Steps
+Download the pretrained weights from model zoo. Specify the path in the form of ```/path/to/train/ 0``` where 0 is the label
 
-Run the '''finetune.py''' and specify the path to your image. 
-
+Run ```finetune.py```
