@@ -11,4 +11,6 @@ TestingResults/
 checkpoint_Other/
 checkpoint/
 tensorboard
+generatePath_list.py
+caffe_classes.py
 *.txt
