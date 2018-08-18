@@ -23,7 +23,7 @@ class AlexNet(object):
     def create(self):
 
         # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
-        conv1 = conv(self.X, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
+        conv1 = conv(self.X, 11, 11, 96, 4, 4, padding='VALID', name='conv1') 
         norm1 = lrn(conv1, 2, 1e-04, 0.75, name='norm1')
         pool1 = max_pool(norm1, 3, 3, 2, 2, padding='VALID', name='pool1')
 
@@ -70,7 +70,7 @@ class AlexNet(object):
                     LayerName = OP_Name[:string_end]
                 
                # Copy data to variable and assign it in a session
-                    with tf.variable_scope(LayerName, reuse = tf.AUTO_REUSE):
+                    with tf.variable_scope(LayerName, reuse = True):
                         if len(op.shape)==1:
                             var = tf.get_variable("biases", trainable = False)
                             v_ = session.run(op)

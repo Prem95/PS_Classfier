@@ -8,7 +8,7 @@ datagenerator.py
 CORRECTCLASSIFIED/
 MISCLASSIFIED/
 TestingResults/
-Checkpoint/
+checkpoint_Other/
 checkpoint/
 tensorboard
 *.txt

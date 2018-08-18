@@ -7,12 +7,15 @@ from datetime import datetime
 from alexnetType1 import AlexNet
 from caffe_classes import class_names
 import shutil
+
 num_classes = 2
-original_class_lable = ''
+original_class_label = ''
+miss = 0
+good = 0
 
 imagenet_mean = np.array([104., 117., 124.], dtype=np.float32)
 
-current_dir = './Test_Bank1.txt'
+current_dir = './Path/Test_Bank1.txt'
 image_dir = os.path.join(current_dir, 'images')
 img_path_list = []
 
@@ -28,41 +31,50 @@ with open(current_dir, 'r') as img_files:
 
 resultsFilename = './Result_Classifier_Bank1.txt'
 
-# Check file path
-if (os.path.isdir('MISCLASSIFIED')) == True:
-    print('MISSCLASSIFIED - Exists')
-else:
-    os.makedirs('MISCLASSIFIED')
-
-if (os.path.isdir('CORRECTCLASSIFIED')) == True:
-    print('CORRECTCLASSIFIED - Exists')
-
-
-# Placeholder for input and dropout rate
 x = tf.placeholder(tf.float32, [1, 227, 227, 3])
 keep_prob = tf.placeholder(tf.float32)
 
 with tf.Session() as sess:
 
-    saver = tf.train.import_meta_graph('./checkpoint/model_epoch500.ckpt.meta')
-    saver.restore(sess, tf.train.latest_checkpoint('./checkpoint/'))
+    saver = tf.train.import_meta_graph('./checkpoint_Other/model_epoch500.ckpt.meta')
+    saver.restore(sess,tf.train.latest_checkpoint('./checkpoint_Other/'))
     saved_dict = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+        
     model = AlexNet(x, keep_prob, num_classes, [], saved_dict, load_pretrained_weight=True)
+
+    # Load the pretrained weights into the model
     model.load_initial_weights(sess)
-    score = model.fc8  
+
+    #define activation of last layer as score
+    score = model.fc8
+        
+    #create op to calculate softmax 
     softmax = tf.nn.softmax(score)
-
-    fig2 = plt.figure(figsize = (10, 5))
-
+    
+    # Loop over all images
     for i, image in enumerate(imgs):
+            
+            img = cv2.resize(image.astype(np.float32), (227, 227))
+        
+            img = img - imagenet_mean
+    
+            img = img.reshape((1, 227, 227, 3))
+        
+            probs = sess.run(softmax, feed_dict={x: img, keep_prob: 1})
+           
+            maxprob = np.argmax(probs)
 
-        img = cv2.resize(image.astype(np.float32), (227,227))
-        img = img - imagenet_mean
-        img = img.reshape((1, 227, 227, 3))
-        probs = sess.run(softmax, feed_dict={x: img, keep_prob: 1})
-        class_name = class_names[np.argmax(probs)]
-        original_class_lable = class_name[5]
-        print("Predicted:" + class_name + " Actual Class: " + test_labels[i] + "Probability: %.4f" %probs[0, np.argmax(probs)])
+            class_name = class_names[maxprob]
 
-
-
+            original_class_label = class_name[6]
+            
+            if ((test_labels[i][0] ) != original_class_label): 
+                miss = miss + 1
+            else:
+                good = good + 1
+            
+            # Filename to write
+            with open(resultsFilename, 'a') as myfile:
+                myfile.write(img_path_list[i] + 'Predicted: ' + class_name[6] + " %.3f " %probs[0, np.argmax(probs)] + 'Actual: ' + test_labels[i])
+    print('Wrong prediction: ' + str(miss), 'Correct prediction: ' + str(good))
+    

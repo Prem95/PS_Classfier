@@ -6,8 +6,8 @@ from datagenerator import ImageDataGenerator
 from datetime import datetime
 
 # Path for the files
-train_file = '/home/stroke95/Desktop/PS_Classfier/Train_Bank1.txt'
-val_file = '/home/stroke95/Desktop/PS_Classfier/Val_Bank1.txt'
+train_file = '/home/stroke95/Desktop/PS_Classfier/Path/Train_Bank1.txt'
+val_file = '/home/stroke95/Desktop/PS_Classfier/Path/Val_Bank1.txt'
 
 # HyperParams
 learning_rate = 0.001  
