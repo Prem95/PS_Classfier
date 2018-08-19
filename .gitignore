@@ -8,9 +8,11 @@ datagenerator.py
 CORRECTCLASSIFIED/
 MISCLASSIFIED/
 TestingResults/
-checkpoint_Other/
+checkpoint_Stage1/
 checkpoint/
-tensorboard
-generatePath_list.py
+tensorboard_Stage1/
 caffe_classes.py
+Path/
 *.txt
+testingPalmSeed.py
+generatePath_list.py

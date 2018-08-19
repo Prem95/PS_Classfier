@@ -51,21 +51,21 @@ class AlexNet(object):
         fc7 = fc(dropout6, 4096, 4096, name='fc7')
         dropout7 = dropout(fc7, self.KEEP_PROB)
 
-        # 8th Layer: FC and return unscaled activations
+        #! Only 2 classes are output
         self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
     def load_initial_weights(self, session):
                           
         if self.load_pretrained_weight == True:
-            print("Loading the self trained weights...")
+            print("Loading the self trained weights for Stage 1 ...")
             weights_dict = self.WEIGHTS_PATH
             
             # Loop over all layer names stored in the weights dict
             for op in weights_dict:
+
                 # Check if the layer is one of the layers that should be reinitialized
                 if op not in self.SKIP_LAYER:
                     OP_Name = op.name
-                    
                     string_end = OP_Name.find('/', 1)
                     LayerName = OP_Name[:string_end]
                 
