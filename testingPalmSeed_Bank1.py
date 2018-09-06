@@ -31,7 +31,7 @@ with open(current_dir, 'r') as img_files:
 
 resultsFilename = './Result_Classifier_Bank1.txt'
 
-x = tf.placeholder(tf.float32, [1, 227, 227, 3])
+x = tf.placeholder(tf.float32, [1, 227, 227, 3]) # Placeholders to store the values for the variables
 keep_prob = tf.placeholder(tf.float32)
 
 with tf.Session() as sess:
@@ -46,7 +46,7 @@ with tf.Session() as sess:
 
     # Define activation of last layer as score
     score = model.fc8
-        
+    
     # Create op to calculate softmax 
     softmax = tf.nn.softmax(score)
     
